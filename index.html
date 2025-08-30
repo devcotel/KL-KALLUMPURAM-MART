@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>devcotel - Local Services</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a nice look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tiro+Devanagari+Malayalam:ital@0;1&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide-static@latest/dist/lucide.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
+        .malayalam-font { font-family: 'Tiro Devanagari Malayalam', serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        
+        .category-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s;
+            border: 1px solid #e5e7eb;
+        }
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #10b981; /* green-500 */
+        }
+
+        .product-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .custom-modal-backdrop {
+            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5);
+            display: flex; align-items: center; justify-content: center; z-index: 100;
+        }
+        .custom-modal-content {
+            background-color: white; padding: 2rem; border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 90%; width: 400px; text-align: center;
+        }
+        .view { display: none; }
+        .view.active { display: block; }
+        #searchResultsContainer { max-height: 300px; }
+        .header-icon-btn {
+            background-color: #f3f4f6;
+            border-radius: 9999px;
+            padding: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .header-icon-btn:hover {
+            background-color: #e5e7eb;
+        }
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1532634896-209424344799?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+            background-size: cover;
+        }
+
+
+     /* CSS കോഡ് ഇവിടെ തുടങ്ങുന്നു */
+    /* -------------------------- */
+
+    /* പൊതുവായ സ്റ്റൈലുകൾ */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f4f7f6;
+        margin: 0;
+        padding: 20px;
+    }
+
+    /* പ്രധാന സെക്ഷന്റെ സ്റ്റൈൽ */
+    .services-section {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .services-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 40px;
+        color: #2c3e50;
+    }
+
+    /* കാറ്റഗറി ബോക്സുകളുടെ ഗ്രിഡ് */
+    .service-categories {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin-bottom: 50px;
+    }
+
+    /* ഓരോ കാറ്റഗറി കാർഡിന്റെയും സ്റ്റൈൽ */
+    .service-card {
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .service-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .service-card h3 {
+        padding: 20px;
+        margin: 0;
+        font-size: 1.2rem;
+        color: #34495e;
+    }
+    
+    /* ക്ലിക്ക് ചെയ്യുമ്പോൾ കാണിക്കേണ്ട പ്രൊഫൈലുകളുടെ ലിസ്റ്റ് */
+    .profile-list {
+        display: none; /* തുടക്കത്തിൽ മറഞ്ഞിരിക്കും */
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 20px;
+        padding-top: 30px;
+        border-top: 2px solid #e0e0e0;
+    }
+    
+    /* JavaScript വഴി active ക്ലാസ് ചേർക്കുമ്പോൾ പ്രൊഫൈലുകൾ കാണിക്കും */
+    .profile-list.active {
+        display: grid;
+    }
+    
+    /* ഓരോ പ്രൊഫൈൽ കാർഡിന്റെയും സ്റ്റൈൽ */
+    .profile-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: transform 0.3s;
+    }
+    
+    .profile-card:hover {
+        transform: scale(1.03);
+    }
+
+    .profile-card img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #3498db;
+        margin-bottom: 15px;
+    }
+
+    .profile-card h4 {
+        margin: 10px 0;
+        font-size: 1.4rem;
+        color: #2c3e50;
+    }
+
+    .profile-card p {
+        margin: 0 0 20px 0;
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+
+    /* ബട്ടണുകൾ വെക്കുന്നതിനുള്ള കണ്ടെയ്‌നർ */
+    .profile-buttons {
+        display: flex;
+        gap: 15px;
+        width: 100%;
+    }
+
+    /* ബട്ടണുകളുടെ സ്റ്റൈൽ */
+    .profile-buttons a {
+        flex-grow: 1;
+        text-decoration: none;
+        color: #fff;
+        padding: 12px 15px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .call-btn {
+        background-color: #3498db; /* നീല നിറം */
+    }
+
+    .call-btn:hover {
+        background-color: #2980b9;
+    }
+
+    .whatsapp-btn {
+        background-color: #25D366; /* WhatsApp പച്ച നിറം */
+    }
+
+    .whatsapp-btn:hover {
+        background-color: #128C7E;
+    }
+
+
+
+
+
+
+
+        #infoBoxContent { white-space: pre-wrap; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- Header Section -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-2xl sm:text-3xl font-bold text-green-700 malayalam-font cursor-pointer" id="homeBtn"> KL കല്ലുംപുറം MART</h1>
+            
+            <div class="flex items-center gap-2 sm:gap-4">
+                <div class="relative flex items-center">
+                    <input type="text" id="searchInput" placeholder="Search..." class="w-0 p-2 border rounded-full transition-all duration-300 ease-in-out focus:w-48 sm:focus:w-64 focus:ring-2 focus:ring-green-500">
+                    <button id="searchIconBtn" class="absolute right-0 p-2 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="search" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <div id="cartIcon" class="relative cursor-pointer header-icon-btn">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span id="cartItemCount" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </div>
+                <button id="adminLoginBtn" class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition duration-300 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-cog"><circle cx="18" cy="15" r="3"/><circle cx="9" cy="7" r="4"/><path d="M2.5 22a7 7 0 0 1 14 0"/><path d="M21.7 13.4a1.5 1.5 0 0 0-2.4 0"/><path d="M20.2 16.2a1.5 1.5 0 0 0 0 2.4"/><path d="M16.2 13.4a1.5 1.5 0 0 0 0 2.4"/><path d="M17.8 16.2a1.5 1.5 0 0 0 2.4 0"/></svg>
+                    <span class="hidden sm:inline">Admin</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <!-- Home View: Category Selection -->
+        <div id="home-view" class="view active">
+            <!-- Hero Section -->
+            <section class="hero-section text-white py-20 sm:py-32">
+                <div class="container mx-auto px-6 text-center">
+                    <h2 class="text-4xl md:text-6xl font-extrabold malayalam-font">നിങ്ങളുടെ വിരൽത്തുമ്പിൽ ഒരു ഗ്രാമം</h2>
+                    <p class="text-lg md:text-xl mt-4 max-w-2xl mx-auto">പലചരക്ക് മുതൽ ടാക്സി വരെ, നിങ്ങളുടെ എല്ലാ പ്രാദേശിക ആവശ്യങ്ങൾക്കും ഒരിടം.</p>
+                </div>
+            </section>
+            
+            <section class="container mx-auto px-6 py-16">
+                 <h3 class="text-3xl font-bold text-center text-gray-800 mb-12 malayalam-font">ഞങ്ങളുടെ സേവനങ്ങൾ</h3>
+                <div id="category-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8">
+                    <!-- Category cards will be inserted here -->
+                </div>
+            </section>
+
+
+
+
+
+
+
+<section class="services-section">
+    <h2>മറ്റു സേവനങ്ങൾ</h2>
+
+    <div class="service-categories">
+        
+        <div class="service-card" data-category="plumbers">
+            <img src="https://png.pngtree.com/png-vector/20230427/ourmid/pngtree-plumber-line-icon-vector-png-image_6720351.png" alt="Plumber">
+            <h3>plumber</h3>
+        </div>
+
+        <div class="service-card" data-category="mechanics">
+            <img src="https://static.vecteezy.com/system/resources/previews/008/325/902/non_2x/mechanic-tool-logo-icon-design-free-vector.jpg" alt="Mechanic">
+            <h3>mechanics</h3>
+        </div>
+
+        <div class="service-card" data-category="electricians">
+            <img src="https://cdn-icons-png.freepik.com/256/3713/3713314.png?semt=ais_white_label" alt="Electrician">
+            <h3>electricians</h3>
+        </div>
+        
+        <div class="service-card" data-category="lpg">
+            <img src="https://cdn-icons-png.flaticon.com/512/11039/11039558.png" alt="Mechanic">
+            <h3>LPG GAS</h3>
+        </div>
+
+        <div class="service-card" data-category="police">
+            <img src="https://static.vecteezy.com/system/resources/thumbnails/028/574/469/small_2x/police-face-3d-rendering-icon-illustration-free-png.png" alt="Plumber">
+            <h3>police</h3>
+        </div>
+
+        <div class="service-card" data-category="member">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2PK13ebCxgAeyGLfYsXgPa4RlQ4wJYEJzkg&s" alt="Electrician">
+            <h3>ward member</h3>
+        </div>
+
+        
+        <div class="service-card" data-category="sos">
+            <img src="https://media.istockphoto.com/id/1468537523/vector/red-flasher-siren-with-text-sos-vector-icon-alert-flashing-light-in-a-flat-style-simple.jpg?s=612x612&w=0&k=20&c=HQBf4bDMjCm_TVkAM6jKUIVm_CYHMf2Yc3ys2_Vyjdw=" alt="Electrician">
+            <h3>SOS</h3>
+        </div>
+
+                
+        <div class="service-card" data-category="ration">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF9FNCECllf_VEHuY-UKkbovjv0l0R4DskYg&s" alt="Electrician">
+            <h3>Ration store</h3>
+        </div>
+
+                        
+        <div class="service-card" data-category="akshaya">
+            <img src="https://images.seeklogo.com/logo-png/32/2/akshaya-logo-png_seeklogo-324113.png" alt="Electrician">
+            <h3>akshaya services</h3>
+        </div>
+
+        <div class="service-card" data-category="tipper">
+            <img src="https://media.istockphoto.com/id/1497995232/vector/big-construction-mining-dump-truck-icon-black-silhouette-side-view-vector-simple-flat.jpg?s=612x612&w=0&k=20&c=VVXLNtoRAE_SO0-HZBzUYEQcCFAZZARWwS0EnzBT51c=" alt="Electrician">
+            <h3>Auto / tipper services</h3>
+    </div>
+
+
+    </div>
+
+     
+    <div class="profile-lists">
+
+        <div id="plumbers" class="profile-list">
+            <div class="profile-card">
+                <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Profile Photo">
+                <h4></h4>
+                <p></p>
+                <div class="profile-buttons">
+                    <a href="tel:+9198743210" class="call-btn"><i class="fas fa-phone"></i> വിളിക്കാം</a>
+                    <a href="https://wa.me/9198765430" target="_blank" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> വാട്സ്ആപ്പ്</a>
+                </div>
+            </div>
+            </div>
+
+        <div id="mechanics" class="profile-list">
+            <div class="profile-card">
+                <img src="https://images.pexels.com/photos/775358/pexels-photo-775358.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Profile Photo">
+                <h4></h4>
+                <p></p>
+                <div class="profile-buttons">
+                    <a href="tel:+9191256789" class="call-btn"><i class="fas fa-phone"></i> വിളിക്കാം</a>
+                    <a href="https://wa.me/9123456789" target="_blank" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> വാട്സ്ആപ്പ്</a>
+                </div>
+            </div>
+             <div class="profile-card">
+                <img src="https://images.pexels.com/photos/1043473/pexels-photo-1043473.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Profile Photo">
+                <h4></h4>
+                <p></p>
+                <div class="profile-buttons">
+                    <a href="tel:+919988776" class="call-btn"><i class="fas fa-phone"></i> </a>
+                    <a href="https://wa.me/919988775" target="_blank" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> വാട്സ്ആപ്പ്</a>
+                </div>
+            </div>
+        </div>
+        
+        <div id="electricians" class="profile-list">
+             <div class="profile-card">
+                <img src="https://images.pexels.com/photos/837358/pexels-photo-837358.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Profile Photo">
+                <h4>ratheesh v</h4>
+                <p>ഹൗസ് വയറിംഗ് </p>
+                <div class="profile-buttons">
+                    <a href="tel:+919745673227" class="call-btn"><i class="fas fa-phone"></i> വിളിക്കാം</a>
+                    <a href="https://wa.me/919745673227" target="_blank" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> വാട്സ്ആപ്പ്</a>
+                </div>
+            </div>
+        </div>
+
+    </div> 
+</section>
+
+
+
+
+
+
+
+
+
+
+            <!-- Info Box Section -->
+            <section class="container mx-auto px-6 pb-16">
+                <div class="bg-white p-8 rounded-lg shadow-md border-l-4 border-green-500">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 malayalam-font">അറിയിപ്പുകൾ</h3>
+                    <div id="infoBoxContent" class="text-gray-600 text-lg leading-relaxed">
+                        <!-- Info content will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Category View: Product Listing -->
+        <div id="category-view" class="view">
+            <div class="container mx-auto px-6 py-8">
+                <div class="flex items-center mb-8">
+                    <button id="backToHomeBtn" class="flex items-center gap-2 text-green-600 hover:text-green-800 font-semibold">
+                        <i data-lucide="arrow-left"></i> Back to Services
+                    </button>
+                </div>
+                <h2 id="category-title" class="text-4xl font-bold malayalam-font text-gray-800 text-center mb-12"></h2>
+                <section id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                    <!-- Product cards for the selected category will be inserted here -->
+                </section>
+            </div>
+        </div>
+    </main>
+
+
+
+
+
+
+
+
+
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 KALLUMPURAM SMART MART . All Rights Reserved.</p>
+            <p class="text-sm text-gray-400 mt-2">Powered by <a href="https://devcotel06.com" target="_blank" class="hover:underline font-semibold">devcotel</a> HOSTED ON GIT PAGES , SUPABASE SERVER </p>
+        </div>
+    </footer>
+
+    <!-- Modals and other fixed elements -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-md max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-2xl font-bold malayalam-font">Your Cart</h3>
+                <button id="closeCartBtn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div id="cartItemsContainer" class="flex-grow overflow-y-auto space-y-4 pr-2"></div>
+            <div class="mt-6 border-t pt-4">
+                <div class="flex justify-between items-center text-xl font-bold">
+                    <span>Total:</span>
+                    <span id="cartTotal">₹0</span>
+                </div>
+                <button id="buyNowBtn" class="mt-4 w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition duration-300 font-bold text-lg">
+                    Place Order
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="adminModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-4xl max-h-full overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold malayalam-font">Admin Panel: <span id="adminCategoryName" class="text-green-700"></span></h3>
+                <button id="closeModalBtn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div class="mb-8">
+                <h4 class="text-xl font-semibold mb-4 border-b pb-2">പുതിയ സാധനം ചേർക്കുക / മാറ്റം വരുത്തുക</h4>
+                <form id="productForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="hidden" id="productId">
+                    <div>
+                        <label for="productName" class="block text-sm font-medium text-gray-700">പേര്</label>
+                        <input type="text" id="productName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+                    </div>
+                    <div>
+                        <label for="productPrice" class="block text-sm font-medium text-gray-700">വില (₹)</label>
+                        <input type="number" id="productPrice" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="productDescription" class="block text-sm font-medium text-gray-700">വിവരണം</label>
+                        <textarea id="productDescription" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="productImage" class="block text-sm font-medium text-gray-700">ചിത്രത്തിന്റെ URL</label>
+                        <input type="url" id="productImage" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" placeholder="https://placehold.co/600x400" required>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end gap-4">
+                         <button type="button" id="clearFormBtn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition duration-300">Clear</button>
+                        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300">Save Product</button>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4 border-b pb-2">നിലവിലുള്ള സാധനങ്ങൾ</h4>
+                <div id="adminProductList" class="space-y-4 max-h-64 overflow-y-auto pr-2"></div>
+            </div>
+        </div>
+    </div>
+    <div id="infoEditModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold malayalam-font">Edit Website Info</h3>
+                <button id="closeInfoModalBtn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <form id="infoForm">
+                <textarea id="infoContentTextarea" rows="10" class="w-full p-2 border rounded-md focus:ring-green-500 focus:border-green-500"></textarea>
+                <div class="flex justify-end gap-4 mt-4">
+                    <button type="button" id="cancelInfoEditBtn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400">Cancel</button>
+                    <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">Save Info</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="customModal" class="custom-modal-backdrop hidden">
+        <div class="custom-modal-content">
+            <p id="customModalMessage" class="mb-4 text-lg"></p>
+            <div id="customModalButtons" class="flex justify-center gap-4"></div>
+        </div>
+    </div>
+    <div id="loadingSpinner" class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-[200]">
+        <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-600"></div>
+    </div>
+
+    <!-- Supabase and App Logic -->
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        const SUPABASE_URL = 'https://szxturkhxlfawivtqfbg.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6eHR1cmtoeGxmYXdpdnRxZmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTMwODcsImV4cCI6MjA3MTY2OTA4N30.3wL5wDRo3uXKwff4NTRjJRCJ0UdvB8QRYrewnWdjm7Y';
+
+        let supabase;
+        let productsCache = [], categoriesCache = [], cart = [];
+        let currentAdminCategory = null;
+
+        const DOMElements = {
+            mainContent: document.querySelector('main'),
+            loadingSpinner: document.getElementById('loadingSpinner'),
+            homeView: document.getElementById('home-view'),
+            categoryView: document.getElementById('category-view'),
+            categoryGrid: document.getElementById('category-grid'),
+            productGrid: document.getElementById('product-grid'),
+            categoryTitle: document.getElementById('category-title'),
+            backToHomeBtn: document.getElementById('backToHomeBtn'),
+            homeBtn: document.getElementById('homeBtn'),
+            adminLoginBtn: document.getElementById('adminLoginBtn'),
+            adminModal: document.getElementById('adminModal'),
+            closeModalBtn: document.getElementById('closeModalBtn'),
+            productForm: document.getElementById('productForm'),
+            adminProductList: document.getElementById('adminProductList'),
+            adminCategoryName: document.getElementById('adminCategoryName'),
+            clearFormBtn: document.getElementById('clearFormBtn'),
+            cartIcon: document.getElementById('cartIcon'),
+            cartModal: document.getElementById('cartModal'),
+            closeCartBtn: document.getElementById('closeCartBtn'),
+            cartItemCount: document.getElementById('cartItemCount'),
+            cartItemsContainer: document.getElementById('cartItemsContainer'),
+            cartTotal: document.getElementById('cartTotal'),
+            buyNowBtn: document.getElementById('buyNowBtn'),
+            searchInput: document.getElementById('searchInput'),
+            searchIconBtn: document.getElementById('searchIconBtn'),
+            searchResultsContainer: document.getElementById('searchResultsContainer'),
+            infoBoxContent: document.getElementById('infoBoxContent'),
+            infoEditModal: document.getElementById('infoEditModal'),
+            closeInfoModalBtn: document.getElementById('closeInfoModalBtn'),
+            infoForm: document.getElementById('infoForm'),
+            infoContentTextarea: document.getElementById('infoContentTextarea'),
+            cancelInfoEditBtn: document.getElementById('cancelInfoEditBtn'),
+        };
+
+        function showView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            if (DOMElements[viewName]) {
+                DOMElements[viewName].classList.add('active');
+            }
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        function showAlert(message) {
+            const modal = document.getElementById('customModal');
+            if (!modal) return;
+            document.getElementById('customModalMessage').innerHTML = message;
+            const buttonsDiv = document.getElementById('customModalButtons');
+            buttonsDiv.innerHTML = `<button id="modalOkBtn" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">OK</button>`;
+            modal.classList.remove('hidden');
+            document.getElementById('modalOkBtn').addEventListener('click', () => modal.classList.add('hidden'), { once: true });
+        }
+
+        function showConfirm(message) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('customModal');
+                if (!modal) {
+                    resolve(false);
+                    return;
+                }
+                document.getElementById('customModalMessage').textContent = message;
+                const buttonsDiv = document.getElementById('customModalButtons');
+                buttonsDiv.innerHTML = `<button id="modalConfirmBtn" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">Yes</button><button id="modalCancelBtn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400">No</button>`;
+                modal.classList.remove('hidden');
+                document.getElementById('modalConfirmBtn').addEventListener('click', () => { modal.classList.add('hidden'); resolve(true); }, { once: true });
+                document.getElementById('modalCancelBtn').addEventListener('click', () => { modal.classList.add('hidden'); resolve(false); }, { once: true });
+            });
+        }
+
+        function renderCategories() {
+            if (!DOMElements.categoryGrid) return;
+            DOMElements.categoryGrid.innerHTML = '';
+            categoriesCache.forEach(cat => {
+                // Don't show the site-admin as a clickable category
+                if (cat.slug === 'site-admin') return;
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-sm p-4 flex flex-col items-center justify-center text-center cursor-pointer category-card';
+                card.dataset.slug = cat.slug;
+                card.innerHTML = `
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 mb-4 flex items-center justify-center">
+                        <img src="${cat.icon_url || 'https://placehold.co/150x150/a7f3d0/166534?text=Icon'}" alt="${cat.name}" class="max-w-full max-h-full object-contain">
+                    </div>
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800">${cat.name}</h3>
+                `;
+                DOMElements.categoryGrid.appendChild(card);
+            });
+        }
+
+        function renderProducts(categorySlug) {
+            const category = categoriesCache.find(c => c.slug === categorySlug);
+            if (!category || !DOMElements.productGrid || !DOMElements.categoryTitle) return;
+
+            DOMElements.categoryTitle.textContent = category.name;
+            DOMElements.productGrid.innerHTML = '';
+            const filteredProducts = productsCache.filter(p => p.category_slug === categorySlug);
+
+            if (filteredProducts.length === 0) {
+                DOMElements.productGrid.innerHTML = `<p class="col-span-full text-center text-gray-500">Ippo ee വിഭാഗത്തിൽ saadhanangal onnum illa.</p>`;
+                return;
+            }
+
+            filteredProducts.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-lg overflow-hidden product-card flex flex-col';
+                card.innerHTML = `
+                    <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/a7f3d0/166534?text=${encodeURIComponent(product.name)}';">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-bold mb-2 malayalam-font">${product.name}</h3>
+                        <p class="text-gray-600 mb-4 flex-grow">${product.description}</p>
+                        <div class="text-2xl font-bold text-green-600 mt-auto pt-4">₹${product.price}</div>
+                        <button data-id="${product.id}" class="add-to-cart-btn mt-4 bg-green-600 text-white text-center px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300">
+                            ${category.is_service ? 'Request Service' : 'Add to Cart'}
+                        </button>
+                    </div>
+                `;
+                DOMElements.productGrid.appendChild(card);
+            });
+        }
+
+        function addToCart(productId) {
+            const product = productsCache.find(p => p.id === productId);
+            if (!product) return;
+            const category = categoriesCache.find(c => c.slug === product.category_slug);
+
+            const cartItem = cart.find(item => item.id === productId);
+            if (cartItem) {
+                cartItem.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            updateCart();
+            showAlert(`${product.name} ${category && category.is_service ? 'request added!' : 'added to cart!'}`);
+        }
+
+        function updateCart() {
+            localStorage.setItem('spicesonCart', JSON.stringify(cart));
+            renderCartItems();
+            updateCartIcon();
+            updateCartTotal();
+        }
+
+        function renderCartItems() {
+            if (!DOMElements.cartItemsContainer || !DOMElements.buyNowBtn) return;
+            DOMElements.cartItemsContainer.innerHTML = '';
+            if (cart.length === 0) {
+                DOMElements.cartItemsContainer.innerHTML = `<p class="text-gray-500 text-center">Your cart is empty.</p>`;
+                DOMElements.buyNowBtn.disabled = true;
+                DOMElements.buyNowBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                return;
+            }
+            DOMElements.buyNowBtn.disabled = false;
+            DOMElements.buyNowBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            cart.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'flex items-center justify-between border-b pb-2';
+                itemEl.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${item.imageUrl}" class="w-16 h-16 object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/100x100/a7f3d0/166534?text=${encodeURIComponent(item.name)}';">
+                        <div>
+                            <p class="font-semibold text-gray-900">${item.name}</p>
+                            <p class="text-sm text-gray-600">₹${item.price}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button data-id="${item.id}" data-change="-1" class="quantity-change bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center">-</button>
+                        <span>${item.quantity}</span>
+                        <button data-id="${item.id}" data-change="1" class="quantity-change bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center">+</button>
+                        <button data-id="${item.id}" class="remove-item text-red-500 hover:text-red-700 text-2xl leading-none">&times;</button>
+                    </div>
+                `;
+                DOMElements.cartItemsContainer.appendChild(itemEl);
+            });
+        }
+
+        function updateCartIcon() {
+            if (!DOMElements.cartItemCount) return;
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            DOMElements.cartItemCount.textContent = totalItems;
+        }
+
+        function updateCartTotal() {
+            if (!DOMElements.cartTotal) return;
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            DOMElements.cartTotal.textContent = `₹${total.toFixed(2)}`;
+        }
+
+        function handleCartAction(e) {
+            const target = e.target.closest('button');
+            if (!target || !target.dataset.id) return;
+            const productId = parseInt(target.dataset.id, 10);
+            
+            if (target.classList.contains('quantity-change')) {
+                const change = parseInt(target.dataset.change, 10);
+                const item = cart.find(i => i.id === productId);
+                if (item) {
+                    item.quantity += change;
+                    if (item.quantity <= 0) {
+                        cart = cart.filter(i => i.id !== productId);
+                    }
+                }
+            } else if (target.classList.contains('remove-item')) {
+                cart = cart.filter(i => i.id !== productId);
+            }
+            updateCart();
+        }
+
+        async function handleBuyNow() {
+            if (cart.length === 0) return;
+
+            const ordersByVendor = cart.reduce((acc, item) => {
+                const category = categoriesCache.find(c => c.slug === item.category_slug);
+                if (category) {
+                    if (!acc[category.slug]) {
+                        acc[category.slug] = {
+                            items: [],
+                            whatsappNumber: category.whatsapp_number,
+                            categoryName: category.name
+                        };
+                    }
+                    acc[category.slug].items.push(item);
+                }
+                return acc;
+            }, {});
+
+            const vendorCount = Object.keys(ordersByVendor).length;
+            if (vendorCount > 1) {
+                const confirmed = await showConfirm(`Your order contains items from ${vendorCount} different vendors. We will open a separate WhatsApp chat for each vendor. Is that okay?`);
+                if (!confirmed) return;
+            }
+
+            for (const slug in ordersByVendor) {
+                const order = ordersByVendor[slug];
+                let message = `Hi, I would like to order the following from ${order.categoryName} via Spiceson Market:\n\n`;
+                let total = 0;
+                order.items.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    message += `- ${item.name} (Qty: ${item.quantity}) - ₹${itemTotal.toFixed(2)}\n`;
+                    total += itemTotal;
+                });
+                message += `\n*Total Price: ₹${total.toFixed(2)}*`;
+                
+                const whatsappLink = `https://wa.me/${order.whatsappNumber}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappLink, '_blank');
+            }
+
+            showAlert("Thank you! Your order messages are being prepared for WhatsApp.");
+
+            setTimeout(() => {
+                cart = [];
+                updateCart();
+                if (DOMElements.cartModal) DOMElements.cartModal.classList.add('hidden');
+            }, 1000);
+        }
+
+        function loadCartFromStorage() {
+            const savedCart = localStorage.getItem('spicesonCart');
+            if (savedCart) {
+                try {
+                    cart = JSON.parse(savedCart);
+                } catch (e) {
+                    console.error("Could not parse cart from localStorage", e);
+                    cart = [];
+                }
+                updateCart();
+            }
+        }
+
+        async function handleAdminLogin() {
+            if (categoriesCache.length === 0) return showAlert("Categories not loaded yet.");
+            
+            const categoryOptions = categoriesCache.map(c => `${c.name} (${c.slug})`).join('\n');
+            const chosenSlug = prompt(`Which section do you want to manage? Enter the full name or the code in brackets:\n\n${categoryOptions}`);
+            if (!chosenSlug) return;
+
+            const chosenInput = chosenSlug.toLowerCase().trim();
+            const category = categoriesCache.find(c => c.slug.toLowerCase() === chosenInput || c.name.toLowerCase() === chosenInput);
+
+            if (!category) {
+                showAlert("Invalid section code.");
+                return;
+            }
+
+            const password = prompt(`Enter admin password for "${category.name}":`);
+            if (password === category.admin_password) {
+                if (category.slug === 'site-admin') {
+                    // Open info edit modal
+                    const { data, error } = await supabase.from('site_info').select('content').eq('key', 'notice_board').single();
+                    if (data && DOMElements.infoContentTextarea) {
+                        DOMElements.infoContentTextarea.value = data.content;
+                    }
+                    if (DOMElements.infoEditModal) DOMElements.infoEditModal.classList.remove('hidden');
+                } else {
+                    // Open product admin modal
+                    currentAdminCategory = category;
+                    if(DOMElements.adminCategoryName) DOMElements.adminCategoryName.textContent = category.name;
+                    renderAdminProductList();
+                    if(DOMElements.adminModal) {
+                        DOMElements.adminModal.classList.remove('hidden');
+                        DOMElements.adminModal.classList.add('flex');
+                    }
+                }
+            } else if (password) {
+                showAlert("Thettaya password!");
+            }
+        }
+
+        function renderAdminProductList() {
+            if (!DOMElements.adminProductList) return;
+            DOMElements.adminProductList.innerHTML = '';
+            if (!currentAdminCategory) return;
+            const filteredProducts = productsCache.filter(p => p.category_slug === currentAdminCategory.slug);
+            
+            filteredProducts.forEach(product => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg';
+                item.innerHTML = `<div><p class="font-semibold text-gray-900">${product.name}</p><p class="text-sm text-gray-800">₹${product.price}</p></div><div class="flex gap-2"><button data-id="${product.id}" class="edit-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Edit</button><button data-id="${product.id}" class="delete-btn bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Delete</button></div>`;
+                DOMElements.adminProductList.appendChild(item);
+            });
+        }
+
+        function closeModal() {
+            if (DOMElements.adminModal) {
+                DOMElements.adminModal.classList.add('hidden');
+                DOMElements.adminModal.classList.remove('flex');
+            }
+            currentAdminCategory = null;
+            resetForm();
+        }
+
+        function resetForm() {
+            if (DOMElements.productForm) DOMElements.productForm.reset();
+            const productIdEl = document.getElementById('productId');
+            if (productIdEl) productIdEl.value = '';
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            if (!supabase || !currentAdminCategory) return;
+            const id = document.getElementById('productId').value;
+            const productData = { 
+                name: document.getElementById('productName').value, 
+                price: parseFloat(document.getElementById('productPrice').value), 
+                description: document.getElementById('productDescription').value, 
+                imageUrl: document.getElementById('productImage').value,
+                category_slug: currentAdminCategory.slug
+            };
+            
+            try {
+                const result = id ? await supabase.from('products').update(productData).eq('id', id) : await supabase.from('products').insert([productData]);
+                if (result.error) throw result.error;
+                showAlert(id ? 'Product വിജയകരമായി update cheythu!' : 'പുതിയ product വിജയകരമായി add cheythu!');
+                resetForm();
+            } catch (error) {
+                console.error("Error saving product: ", error);
+                showAlert('Product save cheyyunnathil prashnam undu.');
+            }
+        }
+        
+        async function handleInfoFormSubmit(e) {
+            e.preventDefault();
+            const newContent = DOMElements.infoContentTextarea.value;
+            const { error } = await supabase.from('site_info').update({ content: newContent }).eq('key', 'notice_board');
+            if (error) {
+                showAlert('Info update cheyyunnathil prashnam undu.');
+                console.error(error);
+            } else {
+                showAlert('Info വിജയകരമായി update cheythu!');
+                if(DOMElements.infoEditModal) DOMElements.infoEditModal.classList.add('hidden');
+            }
+        }
+
+        function handleAdminListClick(e) {
+            const target = e.target;
+            if (!target || !target.dataset.id) return;
+            const id = parseInt(target.dataset.id, 10);
+            
+            if (target.classList.contains('edit-btn')) {
+                const productToEdit = productsCache.find(p => p.id === id);
+                if(productToEdit) {
+                    document.getElementById('productId').value = productToEdit.id;
+                    document.getElementById('productName').value = productToEdit.name;
+                    document.getElementById('productPrice').value = productToEdit.price;
+                    document.getElementById('productDescription').value = productToEdit.description;
+                    document.getElementById('productImage').value = productToEdit.imageUrl;
+                    if (DOMElements.adminModal) DOMElements.adminModal.scrollTo(0, 0);
+                }
+            } else if (target.classList.contains('delete-btn')) {
+                showConfirm("Ee product delete cheyyano?").then(confirmed => confirmed && deleteProduct(id));
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (!supabase) return;
+            try {
+                const { error } = await supabase.from('products').delete().eq('id', id);
+                if (error) throw error;
+                showAlert('Product delete cheythu.');
+                resetForm();
+            } catch (error) {
+                console.error("Error deleting product: ", error);
+                showAlert('Product delete cheyyunnathil prashnam undu.');
+            }
+        }
+
+        function setupSearch() {
+            if(DOMElements.searchIconBtn) DOMElements.searchIconBtn.addEventListener('click', () => {
+                if(DOMElements.searchInput) {
+                    DOMElements.searchInput.classList.toggle('w-0');
+                    DOMElements.searchInput.classList.toggle('w-64');
+                    DOMElements.searchInput.classList.toggle('p-2');
+                    if (!DOMElements.searchInput.classList.contains('w-0')) {
+                        DOMElements.searchInput.focus();
+                    }
+                }
+            });
+
+            if(DOMElements.searchInput) {
+                DOMElements.searchInput.addEventListener('input', () => {
+                    const query = DOMElements.searchInput.value.toLowerCase().trim();
+                    if (query.length < 2) {
+                        if (DOMElements.searchResultsContainer) DOMElements.searchResultsContainer.classList.add('hidden');
+                        return;
+                    }
+
+                    const results = productsCache.filter(p => 
+                        p.name.toLowerCase().includes(query) || 
+                        p.description.toLowerCase().includes(query)
+                    );
+                    
+                    if (DOMElements.searchResultsContainer) {
+                        DOMElements.searchResultsContainer.innerHTML = '';
+                        if (results.length > 0) {
+                            results.forEach(product => {
+                                const category = categoriesCache.find(c => c.slug === product.category_slug);
+                                const item = document.createElement('div');
+                                item.className = 'p-3 hover:bg-gray-100 cursor-pointer border-b flex items-center gap-4';
+                                item.dataset.slug = product.category_slug;
+                                item.innerHTML = `
+                                    <img src="${product.imageUrl}" class="w-12 h-12 object-cover rounded" onerror="this.onerror=null;this.src='https://placehold.co/100x100/a7f3d0/166534?text=...';">
+                                    <div>
+                                        <p class="font-semibold">${product.name}</p>
+                                        <p class="text-sm text-gray-500">in ${category ? category.name : 'Unknown'}</p>
+                                    </div>
+                                `;
+                                DOMElements.searchResultsContainer.appendChild(item);
+                            });
+                            DOMElements.searchResultsContainer.classList.remove('hidden');
+                        } else {
+                            DOMElements.searchResultsContainer.classList.add('hidden');
+                        }
+                    }
+                });
+                
+                DOMElements.searchInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        if (DOMElements.searchInput && DOMElements.searchInput.value === '') {
+                            DOMElements.searchInput.classList.add('w-0');
+                            DOMElements.searchInput.classList.remove('w-64', 'p-2');
+                        }
+                        if (DOMElements.searchResultsContainer) DOMElements.searchResultsContainer.classList.add('hidden');
+                    }, 200);
+                });
+            }
+        }
+
+        function setupEventListeners() {
+            if (DOMElements.homeBtn) DOMElements.homeBtn.addEventListener('click', () => showView('homeView'));
+            if (DOMElements.backToHomeBtn) DOMElements.backToHomeBtn.addEventListener('click', () => showView('homeView'));
+            if (DOMElements.adminLoginBtn) DOMElements.adminLoginBtn.addEventListener('click', handleAdminLogin);
+            if (DOMElements.closeModalBtn) DOMElements.closeModalBtn.addEventListener('click', closeModal);
+            if (DOMElements.productForm) DOMElements.productForm.addEventListener('submit', handleFormSubmit);
+            if (DOMElements.adminProductList) DOMElements.adminProductList.addEventListener('click', handleAdminListClick);
+            if (DOMElements.clearFormBtn) DOMElements.clearFormBtn.addEventListener('click', resetForm);
+            if (DOMElements.cartIcon) DOMElements.cartIcon.addEventListener('click', () => {
+                if (DOMElements.cartModal) DOMElements.cartModal.classList.remove('hidden');
+            });
+            if (DOMElements.closeCartBtn) DOMElements.closeCartBtn.addEventListener('click', () => {
+                if (DOMElements.cartModal) DOMElements.cartModal.classList.add('hidden');
+            });
+            if (DOMElements.cartItemsContainer) DOMElements.cartItemsContainer.addEventListener('click', handleCartAction);
+            if (DOMElements.buyNowBtn) DOMElements.buyNowBtn.addEventListener('click', handleBuyNow);
+            
+            if (DOMElements.infoForm) DOMElements.infoForm.addEventListener('submit', handleInfoFormSubmit);
+            if (DOMElements.closeInfoModalBtn) DOMElements.closeInfoModalBtn.addEventListener('click', () => DOMElements.infoEditModal.classList.add('hidden'));
+            if (DOMElements.cancelInfoEditBtn) DOMElements.cancelInfoEditBtn.addEventListener('click', () => DOMElements.infoEditModal.classList.add('hidden'));
+
+            setupSearch();
+
+            if (DOMElements.categoryGrid) DOMElements.categoryGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.category-card');
+                if (card && card.dataset.slug) {
+                    const slug = card.dataset.slug;
+                    renderProducts(slug);
+                    showView('categoryView');
+                }
+            });
+
+            if (DOMElements.productGrid) DOMElements.productGrid.addEventListener('click', (e) => {
+                const btn = e.target.closest('.add-to-cart-btn');
+                if (btn && btn.dataset.id) {
+                    const productId = parseInt(btn.dataset.id, 10);
+                    addToCart(productId);
+                }
+            });
+
+            if (DOMElements.searchResultsContainer) DOMElements.searchResultsContainer.addEventListener('mousedown', (e) => {
+                const item = e.target.closest('div[data-slug]');
+                if (item && item.dataset.slug) {
+                    const slug = item.dataset.slug;
+                    renderProducts(slug);
+                    showView('categoryView');
+                    if (DOMElements.searchInput) DOMElements.searchInput.value = '';
+                    if (DOMElements.searchResultsContainer) DOMElements.searchResultsContainer.classList.add('hidden');
+                }
+            });
+
+            // Corrected and integrated service card logic
+            const serviceCards = document.querySelectorAll('.service-card');
+            const profileLists = document.querySelectorAll('.profile-list');
+            serviceCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const category = card.dataset.category;
+                    const targetProfileList = document.getElementById(category);
+
+                    profileLists.forEach(list => {
+                        if (list.id !== category) {
+                            list.classList.remove('active');
+                        }
+                    });
+
+                    if (targetProfileList) {
+                        targetProfileList.classList.toggle('active');
+                    }
+                    
+                    if (targetProfileList && targetProfileList.classList.contains('active')) {
+                        setTimeout(() => {
+                            targetProfileList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 300);
+                    }
+                });
+            });
+        }
+
+        async function initializeApp() {
+            DOMElements.loadingSpinner.classList.remove('hidden');
+            try {
+                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                const [categoriesRes, productsRes, infoRes] = await Promise.all([
+                    supabase.from('categories').select('*'),
+                    supabase.from('products').select('*'),
+                    supabase.from('site_info').select('content').eq('key', 'notice_board').single()
+                ]);
+
+                if (categoriesRes.error) throw categoriesRes.error;
+                if (!categoriesRes.data || categoriesRes.data.length === 0) {
+                     if (DOMElements.mainContent) DOMElements.mainContent.innerHTML = `<p class="text-center text-red-500 font-semibold p-4 bg-red-100 rounded-lg"><b>Database Error:</b> No categories found. Please add at least one category in Supabase.</p>`;
+                     return;
+                }
+                categoriesCache = categoriesRes.data;
+
+                if (productsRes.error) throw productsRes.error;
+                productsCache = productsRes.data || [];
+                
+                if (infoRes.data && DOMElements.infoBoxContent) {
+                    DOMElements.infoBoxContent.textContent = infoRes.data.content;
+                }
+
+                renderCategories();
+                loadCartFromStorage();
+                setupEventListeners();
+                showView('homeView');
+                
+                supabase.channel('public:products').on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, async () => {
+                    const { data: updatedProducts } = await supabase.from('products').select('*');
+                    if (updatedProducts) productsCache = updatedProducts;
+                    if (document.getElementById('category-view')?.classList.contains('active')) {
+                        const categoryTitleEl = document.getElementById('category-title');
+                        if (categoryTitleEl) {
+                            const category = categoriesCache.find(c => c.name === categoryTitleEl.textContent);
+                            if (category) renderProducts(category.slug);
+                        }
+                    }
+                    if (currentAdminCategory) renderAdminProductList();
+                }).subscribe();
+
+                supabase.channel('public:site_info').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_info', filter: 'key=eq.notice_board' }, (payload) => {
+                    if (DOMElements.infoBoxContent && payload.new.content) {
+                        DOMElements.infoBoxContent.textContent = payload.new.content;
+                    }
+                }).subscribe();
+
+
+            } catch (error) {
+                console.error("Initialization Error:", error);
+                let errorMessage = `App load cheyyunnathil prashnam undu. Supabase connection check cheyyuka.`;
+                if (error && error.message) {
+                    errorMessage = `<b>An error occurred:</b><br>${error.message}<br><br>Please check your Supabase setup and RLS policies.`;
+                }
+                if (DOMElements.mainContent) DOMElements.mainContent.innerHTML = `<p class="text-center text-red-500 font-semibold p-4 bg-red-100 rounded-lg">${errorMessage}</p>`;
+            } finally {
+                if(DOMElements.loadingSpinner) DOMElements.loadingSpinner.classList.add('hidden');
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
